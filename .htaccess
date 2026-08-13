@@ -1,0 +1,36 @@
+# Apache 301 redirects — old page URLs to new keyword-optimized URLs
+Redirect 301 /ux-ui-design.html /ux-ui-design-course-in-chennai.html
+Redirect 301 /web-design.html /web-design-course-in-chennai.html
+Redirect 301 /graphic-design.html /graphic-design-course-in-chennai.html
+Redirect 301 /courses.html /design-courses-in-chennai.html
+Redirect 301 /students-works.html /ux-ui-student-portfolio-chennai.html
+Redirect 301 /faq.html /ux-ui-course-faqs-chennai.html
+Redirect 301 /about.html /about-ovi-design-academy-chennai.html
+Redirect 301 /contact.html /contact-ovi-design-academy-chennai.html
+Redirect 301 /design-courses-chennai.html /design-courses-in-chennai.html
+Redirect 301 /graphic-design-course-chennai.html /graphic-design-course-in-chennai.html
+Redirect 301 /life-at-ovi.html /life-at-ovi-design-academy-chennai.html
+Redirect 301 /student-portfolio-chennai.html /ux-ui-student-portfolio-chennai.html
+Redirect 301 /ux-ui-design-course-chennai.html /ux-ui-design-course-in-chennai.html
+Redirect 301 /web-design-course-chennai.html /web-design-course-in-chennai.html
+
+# Production security headers (requires mod_headers).
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://docs.google.com; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.instagram.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://docs.google.com https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://www.instagram.com; frame-src https://www.google.com https://www.youtube.com https://www.instagram.com; media-src 'self'; manifest-src 'self'; upgrade-insecure-requests"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+</IfModule>
+
+# Do not expose directory listings or hidden configuration files.
+Options -Indexes
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(vercel\.json|_headers|_redirects|design-qa\.md)$">
+  Require all denied
+</FilesMatch>
