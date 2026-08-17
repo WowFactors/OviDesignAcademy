@@ -668,6 +668,13 @@ bindGoogleFormSubmission(contactForm, {
 // endpoint doesn't allow cross-origin requests. The confirmation page opens
 // in a new tab so visitors stay on the site.
 document.querySelectorAll(".news-form").forEach((form) => {
+  if (!form.querySelector(".news-consent")) {
+    const consent = document.createElement("label");
+    consent.className = "form-consent news-consent";
+    consent.innerHTML = '<input type="checkbox" required /> <span>I agree to receive design tips, batch dates and student updates by email.</span>';
+    form.appendChild(consent);
+  }
+
   form.addEventListener("submit", (e) => {
     if (!form.checkValidity()) {
       e.preventDefault();
