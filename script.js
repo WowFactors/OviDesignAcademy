@@ -15,23 +15,96 @@ document.querySelectorAll('img[loading="lazy"]:not([decoding])').forEach((img) =
 });
 
 const SLIDES = [
-  { eyebrow: "AI-Ready UX/UI Program", t1: "Become an AI-Ready UX/UI Designer", t2: "in just 3.5 months.", body: "Master UX/UI Design with Figma, AI Tools, and Design Systems. Build a job-ready portfolio with expert mentorship." },
-  { eyebrow: "AI + UX + UI + Portfolio", t1: "Your Design Career", t2: "Starts Here.", body: "Join Chennai's industry-focused UX/UI program and learn how modern designers use AI, Figma, research, prototyping, and design systems to build products companies hire for." },
-  { eyebrow: "Built Like Top Product Teams", t1: "Learn UX Design the way", t2: "top companies build products.", body: "Go beyond Figma. Learn UX Research, AI-assisted Design, UI Design, Design Systems, Case Studies, and Portfolio Presentation from professionals with 25+ years of product design experience." }
+  { eyebrow: "AI-Ready UX/UI Program", t1: "Upscale your career", t2: "Graphic to UX + Ai", body: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications." },
+  { eyebrow: "AI + UX + UI + Portfolio", t1: "AI-Powered UX/UI &", t2: "Vibe Prototyping", body: "Join Chennai's industry-focused UX/UI program and learn how modern designers use AI, Figma, research, prototyping, and design systems to build products companies hire for." },
+  {
+    eyebrow: "AI-Powered UX/UI + Vibe Coding Course",
+    t1: "Don't Just Design,.",
+    t2: "Build them with AI.",
+    body: "Learn UX/UI Design, AI Tools & Vibe Coding to turn your ideas into functional mobile and web apps — without traditional coding.",
+    flow: "Research → Design → AI → Prototype → Build → Launch",
+    meta: ["2 Months", "Live Training", "Real Project", "No Traditional Coding"],
+    primaryCta: "Book Free Demo Class",
+    secondaryCta: {
+      text: "Talk to Mentor",
+      href: "https://wa.me/919444074941?text=" + encodeURIComponent("Hi Ovi Design Academy, I'd like to talk to a mentor about the AI-Powered UX/UI + Vibe Coding course."),
+      external: true
+    },
+    trust: ["25+ Years Experience", "Live Projects", "Portfolio", "AI Tools", "No Coding Required"]
+  }
 ];
 const HERO_PRIMARY_CTA = "Start Your Free Demo";
 const HERO_SECONDARY_CTA = "Explore Courses";
 const HERO_SLIDE_INTERVAL = 5000;
+// ---------- Next batch / early-bird cycle ----------
+// Cohorts start on the 10th of every month. The early-bird discount
+// closes on the 5th of that same month. Both dates below always resolve
+// to the next upcoming cycle — never a date that has already passed.
+const BATCH_START_DAY = 10;
+const EARLY_BIRD_END_DAY = 5;
+const EARLY_BIRD_DISCOUNT = "₹4,999";
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const LONG_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+function getNextBatchCycle(reference) {
+  // Batch (10th) and early-bird (5th) always travel together as one cycle.
+  // Once the early-bird window for the current month has closed (i.e. we're
+  // past the 5th), both dates roll forward to next month — so the early-bird
+  // date shown is never a date that has already passed, and it always pairs
+  // with the batch it actually applies to.
+  const now = reference || new Date();
+  let cycleMonth = now.getMonth();
+  const cycleYear = now.getFullYear();
+  if (now.getDate() > EARLY_BIRD_END_DAY) {
+    cycleMonth += 1;
+  }
+  const batchDate = new Date(cycleYear, cycleMonth, BATCH_START_DAY);
+  const earlyBirdDate = new Date(cycleYear, cycleMonth, EARLY_BIRD_END_DAY, 23, 59, 59);
+  return { batchDate, earlyBirdDate };
+}
+
+function formatBatchDate(date, style) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const months = style === "long" ? LONG_MONTHS : SHORT_MONTHS;
+  return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function toISTDeadline(date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T23:59:59+05:30`;
+}
+
+const NEXT_BATCH_CYCLE = getNextBatchCycle();
+const NEXT_BATCH_LABEL_SHORT = formatBatchDate(NEXT_BATCH_CYCLE.batchDate);
+const NEXT_BATCH_LABEL_LONG = formatBatchDate(NEXT_BATCH_CYCLE.batchDate, "long");
+const EARLY_BIRD_LABEL_SHORT = formatBatchDate(NEXT_BATCH_CYCLE.earlyBirdDate);
+const EARLY_BIRD_DAY_MONTH = `${String(NEXT_BATCH_CYCLE.earlyBirdDate.getDate()).padStart(2, "0")} ${SHORT_MONTHS[NEXT_BATCH_CYCLE.earlyBirdDate.getMonth()]}`;
+
+function applyNextBatchDates() {
+  document.querySelectorAll("[data-next-batch-short]").forEach((el) => {
+    el.textContent = NEXT_BATCH_LABEL_SHORT;
+  });
+  document.querySelectorAll("[data-next-batch-long]").forEach((el) => {
+    el.textContent = NEXT_BATCH_LABEL_LONG;
+  });
+  document.querySelectorAll("[data-early-bird]").forEach((el) => {
+    el.textContent = `${EARLY_BIRD_DISCOUNT} off · ends ${EARLY_BIRD_LABEL_SHORT}`;
+  });
+}
+document.addEventListener("DOMContentLoaded", applyNextBatchDates);
+
 const PROMO_BANNER = {
   enabled: true,
   id: "next-batch-demo-offer-2026",
   image: "image/ux-ui-masterclass-visual-poster.jpg",
   imageAlt: "Students learning UX UI design on a laptop interface.",
   eyebrow: "Limited-time offer",
-  title: "Next UX UI Master Class starts soon",
-  body: "Attend a free demo class before the offer closes. Seats are limited for the next batch.",
-  deadline: "2026-08-17T23:59:59+05:30",
-  deadlineLabel: "Offer closes 17 Aug",
+  title: "Next UX UI + Ai Vibe Design batch starts soon",
+  body: `Attend a free demo class before the offer closes and save ${EARLY_BIRD_DISCOUNT} on your enrollment. Seats are limited for the next batch.`,
+  deadline: toISTDeadline(NEXT_BATCH_CYCLE.earlyBirdDate),
+  deadlineLabel: `Offer closes ${EARLY_BIRD_DAY_MONTH}`,
   seatsLabel: "Limited seats available",
   formCtaLabel: "Open enquiry form",
   whatsappCtaLabel: "Chat on WhatsApp",
@@ -43,13 +116,33 @@ const PROMO_BANNER = {
 var cur = 0;
 var heroSlideTimer = null;
 
+const HERO_SECONDARY_ICON_PLAY = { html: '<polygon points="5 3 19 12 5 21 5 3"/>', fill: "currentColor", stroke: "none" };
+const HERO_SECONDARY_ICON_CHAT = { html: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>', fill: "none", stroke: "currentColor" };
+
+function setHeroPillRow(el, items, divider) {
+  if (!el) {
+    return;
+  }
+  if (items && items.length) {
+    el.innerHTML = items.map((item) => `<span>${item}</span>`).join(`<span class="d">${divider}</span>`);
+    el.style.display = "inline-flex";
+  } else {
+    el.style.display = "none";
+  }
+}
+
 function renderSlide(i) {
   const eyebrow = document.getElementById("h-eyebrow-text");
   const t1 = document.getElementById("h-t1");
   const t2 = document.getElementById("h-t2");
   const body = document.getElementById("h-body");
+  const flow = document.getElementById("h-flow");
+  const meta = document.getElementById("h-meta");
+  const trust = document.getElementById("h-trust");
   const primary = document.getElementById("h-primary");
   const secondary = document.getElementById("h-secondary");
+  const secondaryIcon = document.getElementById("h-secondary-icon");
+  const secondaryText = document.getElementById("h-secondary-text");
   const dots = document.querySelectorAll(".slide-dots button");
 
   if (!t1 || !t2 || !body || !primary || !secondary || !dots.length) {
@@ -76,12 +169,40 @@ function renderSlide(i) {
     });
   }, 220);
 
-  primary.textContent = HERO_PRIMARY_CTA;
-  const secondaryText = secondary.lastChild;
-  if (secondaryText && secondaryText.nodeType === Node.TEXT_NODE) {
-    secondaryText.textContent = " " + HERO_SECONDARY_CTA;
+  if (flow) {
+    if (slide.flow) {
+      flow.textContent = slide.flow;
+      flow.style.display = "block";
+    } else {
+      flow.style.display = "none";
+    }
+  }
+
+  setHeroPillRow(meta, slide.meta, "•");
+  setHeroPillRow(trust, slide.trust, "|");
+
+  primary.textContent = slide.primaryCta || HERO_PRIMARY_CTA;
+
+  const sec = slide.secondaryCta;
+  secondary.href = sec ? sec.href : "#courses";
+  if (sec && sec.external) {
+    secondary.setAttribute("target", "_blank");
+    secondary.setAttribute("rel", "noopener");
   } else {
-    secondary.innerHTML = secondary.innerHTML.replace(/>([^<]*)<\/a>$/, ">" + HERO_SECONDARY_CTA + "</a>");
+    secondary.removeAttribute("target");
+    secondary.removeAttribute("rel");
+  }
+  if (secondaryText) {
+    secondaryText.textContent = sec ? sec.text : HERO_SECONDARY_CTA;
+  }
+  if (secondaryIcon) {
+    const icon = sec && sec.external ? HERO_SECONDARY_ICON_CHAT : HERO_SECONDARY_ICON_PLAY;
+    secondaryIcon.innerHTML = icon.html;
+    secondaryIcon.setAttribute("fill", icon.fill);
+    secondaryIcon.setAttribute("stroke", icon.stroke);
+    secondaryIcon.setAttribute("stroke-width", "2");
+    secondaryIcon.setAttribute("stroke-linecap", "round");
+    secondaryIcon.setAttribute("stroke-linejoin", "round");
   }
 
   dots.forEach((dot, idx) => dot.classList.toggle("active", idx === i));
@@ -541,28 +662,28 @@ bindGoogleFormSubmission(contactForm, {
   defaultButtonText: "Submit Enquiry"
 });
 
-// ---------- Newsletter forms ----------
+// ---------- Newsletter forms (Mailchimp) ----------
+// Submits natively to Mailchimp's hosted list endpoint (action/method/target
+// set in the HTML) — no fetch/AJAX needed since Mailchimp's classic embed
+// endpoint doesn't allow cross-origin requests. The confirmation page opens
+// in a new tab so visitors stay on the site.
 document.querySelectorAll(".news-form").forEach((form) => {
   form.addEventListener("submit", (e) => {
-    e.preventDefault();
     if (!form.checkValidity()) {
+      e.preventDefault();
       form.reportValidity();
       return;
     }
-    const emailField = form.querySelector('input[type="email"]');
-    const email = emailField ? emailField.value.trim() : "";
     const btn = form.querySelector('button[type="submit"]');
     if (btn) {
-      btn.textContent = "Opening email…";
-    }
-    const subject = encodeURIComponent("Newsletter subscription request");
-    const body = encodeURIComponent(`Please add ${email} to the Ovi Design Academy updates list.`);
-    window.location.href = `mailto:info@ovidesign.in?subject=${subject}&body=${body}`;
-    setTimeout(() => {
-      if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Subscribing…";
+      setTimeout(() => {
+        btn.disabled = false;
         btn.textContent = "Subscribe by email";
-      }
-    }, 1200);
+      }, 4000);
+    }
+    // Let the form submit normally to Mailchimp from here.
   });
 });
 
@@ -772,9 +893,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   <div class="input-group">
                     <select id="preferred-course" name="entry.376165871" aria-label="Preferred course" autocomplete="off" required>
                       <option value="">Preferred course</option>
-                      <option>UX UI Masterclass</option>
-                      <option>Web Design</option>
-                      <option>Graphics Design</option>
+                      <option>UX UI + Ai Vibe Design</option>
+                      <option>Advanced UX/UI + AI Leadership Program</option>
                     </select>
                   </div>
 
