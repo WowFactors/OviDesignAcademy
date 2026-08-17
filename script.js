@@ -1255,10 +1255,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const getCourseHref = (course) => {
       const key = `${course.tag || ""} ${course.h || ""}`.toLowerCase();
       if (course.url) return course.url;
-      if (key.includes("ux")) return "ux-ui-design-course-chennai.html";
-      if (key.includes("web")) return "web-design-course-chennai.html";
-      if (key.includes("graphic") || key.includes("gd")) return "graphic-design-course-chennai.html";
-      return "design-courses-chennai.html";
+      if (key.includes("advanced")) return "advanced-ux-ui-ai-course-chennai.html";
+      if (key.includes("ux")) return "ux-ui-design-course-in-chennai.html";
+      return "compare-ux-ui-courses-chennai.html";
     };
     el.innerHTML = courseCrossSell.map((course) => `
       <a href="${getCourseHref(course)}" class="rel-card rel-${course.cls}">
