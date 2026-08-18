@@ -15,22 +15,18 @@ document.querySelectorAll('img[loading="lazy"]:not([decoding])').forEach((img) =
 });
 
 const SLIDES = [
-  { eyebrow: "AI-Ready UX/UI Program", t1: "Upscale your career", t2: "Graphic to UX + Ai", body: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications." },
-  { eyebrow: "AI + UX + UI + Portfolio", t1: "AI-Powered UX/UI &", t2: "Vibe Prototyping", body: "Join Chennai's industry-focused UX/UI program and learn how modern designers use AI, Figma, research, prototyping, and design systems to build products companies hire for." },
+  { t1: "Upscale your career", t2: "Graphic to UX + Ai", body: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications." },
+  { t1: "AI-Powered UX/UI &", t2: "Vibe Prototyping", body: "Join Chennai’s industry-focused UX/UI program and learn AI, Figma, research, prototyping, and design systems." },
   {
-    eyebrow: "AI-Powered UX/UI + Vibe Coding Course",
     t1: "Don't Just Design,.",
     t2: "Build them with AI.",
     body: "Learn UX/UI Design, AI Tools & Vibe Coding to turn your ideas into functional mobile and web apps — without traditional coding.",
-    flow: "Research → Design → AI → Prototype → Build → Launch",
-    meta: ["2 Months", "Live Training", "Real Project", "No Traditional Coding"],
     primaryCta: "Book Free Demo Class",
     secondaryCta: {
       text: "Talk to Mentor",
       href: "https://wa.me/919444074941?text=" + encodeURIComponent("Hi Ovi Design Academy, I'd like to talk to a mentor about the AI-Powered UX/UI + Vibe Coding course."),
       external: true
-    },
-    trust: ["25+ Years Experience", "Live Projects", "Portfolio", "AI Tools", "No Coding Required"]
+    }
   }
 ];
 const HERO_PRIMARY_CTA = "Start Your Free Demo";
@@ -119,26 +115,10 @@ var heroSlideTimer = null;
 const HERO_SECONDARY_ICON_PLAY = { html: '<polygon points="5 3 19 12 5 21 5 3"/>', fill: "currentColor", stroke: "none" };
 const HERO_SECONDARY_ICON_CHAT = { html: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>', fill: "none", stroke: "currentColor" };
 
-function setHeroPillRow(el, items, divider) {
-  if (!el) {
-    return;
-  }
-  if (items && items.length) {
-    el.innerHTML = items.map((item) => `<span>${item}</span>`).join(`<span class="d">${divider}</span>`);
-    el.style.display = "inline-flex";
-  } else {
-    el.style.display = "none";
-  }
-}
-
 function renderSlide(i) {
-  const eyebrow = document.getElementById("h-eyebrow-text");
   const t1 = document.getElementById("h-t1");
   const t2 = document.getElementById("h-t2");
   const body = document.getElementById("h-body");
-  const flow = document.getElementById("h-flow");
-  const meta = document.getElementById("h-meta");
-  const trust = document.getElementById("h-trust");
   const primary = document.getElementById("h-primary");
   const secondary = document.getElementById("h-secondary");
   const secondaryIcon = document.getElementById("h-secondary-icon");
@@ -150,10 +130,6 @@ function renderSlide(i) {
   }
 
   const slide = SLIDES[i];
-  if (eyebrow) {
-    eyebrow.textContent = slide.eyebrow;
-  }
-
   [t1, t2, body].forEach((el) => {
     el.style.opacity = 0;
     el.style.transform = "translateY(10px)";
@@ -168,18 +144,6 @@ function renderSlide(i) {
       el.style.transform = "none";
     });
   }, 220);
-
-  if (flow) {
-    if (slide.flow) {
-      flow.textContent = slide.flow;
-      flow.style.display = "block";
-    } else {
-      flow.style.display = "none";
-    }
-  }
-
-  setHeroPillRow(meta, slide.meta, "•");
-  setHeroPillRow(trust, slide.trust, "|");
 
   primary.textContent = slide.primaryCta || HERO_PRIMARY_CTA;
 
