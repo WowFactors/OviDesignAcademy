@@ -91,6 +91,24 @@ function applyNextBatchDates() {
 }
 document.addEventListener("DOMContentLoaded", applyNextBatchDates);
 
+function sortStudentWorkByBatch() {
+  document.querySelectorAll(".student-work-grid--flow").forEach((grid) => {
+    const cards = Array.from(grid.querySelectorAll(":scope > .student-work-card"));
+    const rankedCards = cards.map((card, index) => {
+      const batchRow = Array.from(card.querySelectorAll("dl > div")).find((row) => row.querySelector("dt")?.textContent.trim() === "Batch No");
+      const batch = batchRow?.querySelector("dd")?.textContent.trim() || "";
+      const match = batch.match(/^B(\d+)\s+(\d{4})/i);
+      const rank = match ? (Number(match[2]) * 100) + Number(match[1]) : -1;
+      return { card, index, rank };
+    });
+
+    rankedCards
+      .sort((a, b) => (b.rank - a.rank) || (a.index - b.index))
+      .forEach(({ card }) => grid.appendChild(card));
+  });
+}
+document.addEventListener("DOMContentLoaded", sortStudentWorkByBatch);
+
 const PROMO_BANNER = {
   enabled: true,
   id: "next-batch-demo-offer-2026",
