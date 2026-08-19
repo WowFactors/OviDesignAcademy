@@ -1,3 +1,79 @@
+// ---------- Broken-page fallback ----------
+// Apache handles real 404 responses through .htaccess. This guard also covers
+// static hosts that return index.html for an unknown URL, and bad local links.
+(() => {
+  const validPages = new Set([
+    "index.html",
+    "404.html",
+    "about-ovi-design-academy-chennai.html",
+    "advanced-ux-ui-ai-course-chennai.html",
+    "compare-ux-ui-courses-chennai.html",
+    "contact-ovi-design-academy-chennai.html",
+    "life-at-ovi-design-academy-chennai.html",
+    "ux-ui-course-faqs-chennai.html",
+    "ux-ui-design-course-in-chennai.html",
+    "ux-ui-student-portfolio-chennai.html"
+  ]);
+
+  const pageNameFromPath = (pathname) => {
+    if (!pathname || pathname === "/") return "index.html";
+    if (pathname.endsWith("/")) return "__directory__";
+    const parts = pathname.split("/").filter(Boolean);
+    return decodeURIComponent(parts[parts.length - 1] || "index.html").toLowerCase();
+  };
+
+  const isValidPage = (pathname) => validPages.has(pageNameFromPath(pathname));
+  const isPageUrl = (pathname) => {
+    const name = pageNameFromPath(pathname);
+    return name.endsWith(".html") || !name.includes(".");
+  };
+
+  const notFoundUrl = () => {
+    // Keep local file previews working, but use the domain root in production.
+    if (window.location.protocol === "file:") {
+      return new URL("404.html", document.baseURI).href;
+    }
+    return new URL("/404.html", window.location.origin).href;
+  };
+
+  const redirectTo404 = () => {
+    if (pageNameFromPath(window.location.pathname) !== "404.html") {
+      window.location.replace(notFoundUrl());
+    }
+  };
+
+  // Catch unknown URLs when a static host incorrectly serves index.html for them.
+  if (isPageUrl(window.location.pathname) && !isValidPage(window.location.pathname)) {
+    redirectTo404();
+    return;
+  }
+
+  // Catch broken same-site page links before the browser opens them.
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const link = event.target.closest("a[href]");
+    if (!link || link.hasAttribute("download") || (link.target && link.target !== "_self")) return;
+
+    const href = link.getAttribute("href").trim();
+    if (!href || href.startsWith("#") || /^(?:mailto:|tel:|sms:|javascript:)/i.test(href)) return;
+
+    let target;
+    try {
+      target = new URL(href, document.baseURI);
+    } catch (error) {
+      event.preventDefault();
+      redirectTo404();
+      return;
+    }
+
+    if (target.origin !== window.location.origin || !isPageUrl(target.pathname) || isValidPage(target.pathname)) return;
+
+    event.preventDefault();
+    redirectTo404();
+  });
+})();
+
 // ---------- Data ----------
 const prefersReducedMotion = typeof window.matchMedia === "function"
   ? window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -13,6 +89,70 @@ const runWhenIdle = (fn, timeout = 1200) => {
 document.querySelectorAll('img[loading="lazy"]:not([decoding])').forEach((img) => {
   img.decoding = "async";
 });
+
+function ensureAccessibleShell() {
+  const main = document.querySelector("main");
+  if (main && !main.id) {
+    main.id = "main-content";
+  }
+
+  if (document.body && main && !document.querySelector(".skip-link")) {
+    const skipLink = document.createElement("a");
+    skipLink.className = "skip-link";
+    skipLink.href = `#${main.id}`;
+    skipLink.textContent = "Skip to main content";
+    document.body.insertBefore(skipLink, document.body.firstChild);
+  }
+}
+
+function getFocusableElements(container) {
+  if (!container) {
+    return [];
+  }
+
+  return Array.from(container.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter((element) => {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+    if (element.hidden || element.getAttribute("aria-hidden") === "true" || element.hasAttribute("inert")) {
+      return false;
+    }
+    return element.offsetParent !== null || element === document.activeElement;
+  });
+}
+
+function trapFocusInContainer(event, container) {
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const focusable = getFocusableElements(container);
+  if (!focusable.length) {
+    event.preventDefault();
+    if (container instanceof HTMLElement) {
+      container.focus();
+    }
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+    return;
+  }
+
+  if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", ensureAccessibleShell);
 
 const SLIDES = [
   { t1: "Upscale your career", t2: "Graphic to UX + Ai", body: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications." },
@@ -86,10 +226,180 @@ function applyNextBatchDates() {
     el.textContent = NEXT_BATCH_LABEL_LONG;
   });
   document.querySelectorAll("[data-early-bird]").forEach((el) => {
-    el.textContent = `${EARLY_BIRD_DISCOUNT} off · ends ${EARLY_BIRD_LABEL_SHORT}`;
+    const discount = el.dataset.earlyBirdDiscount || EARLY_BIRD_DISCOUNT;
+    el.textContent = `${discount} off · ends ${EARLY_BIRD_LABEL_SHORT}`;
   });
 }
 document.addEventListener("DOMContentLoaded", applyNextBatchDates);
+
+// ---------- Live Google reviews ----------
+// Configure the deployed Apps Script URL on #reviews[data-google-reviews-endpoint].
+function createGoogleSvg(className, paths) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 48 48");
+  svg.setAttribute("aria-hidden", "true");
+  if (className) svg.setAttribute("class", className);
+
+  paths.forEach(({ fill, d }) => {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("fill", fill);
+    path.setAttribute("d", d);
+    svg.appendChild(path);
+  });
+  return svg;
+}
+
+function createGoogleMark() {
+  return createGoogleSvg("g-mark", [
+    { fill: "#FFC107", d: "M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" },
+    { fill: "#FF3D00", d: "M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" },
+    { fill: "#4CAF50", d: "M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" },
+    { fill: "#1976D2", d: "M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2C41.4 35.6 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z" }
+  ]);
+}
+
+function createReviewStar() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  polygon.setAttribute("points", "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2");
+  svg.appendChild(polygon);
+  return svg;
+}
+
+function createGoogleReviewCard(review, index) {
+  const card = document.createElement("figure");
+  card.className = "gr-card";
+
+  const header = document.createElement("header");
+  const author = review.author || "Google reviewer";
+  if (review.profilePhotoUrl) {
+    const photo = document.createElement("img");
+    photo.src = review.profilePhotoUrl;
+    photo.alt = "";
+    photo.loading = "lazy";
+    photo.decoding = "async";
+    photo.referrerPolicy = "no-referrer";
+    header.appendChild(photo);
+  } else {
+    const avatar = document.createElement("span");
+    const initials = author.split(/\s+/).slice(0, 2).map((part) => part[0] || "").join("").toUpperCase();
+    const colors = ["#7c3bd9", "#3b54d9", "#00866a", "#d14f70", "#1a1830"];
+    avatar.className = "avatar";
+    avatar.style.background = colors[index % colors.length];
+    avatar.textContent = initials || "G";
+    header.appendChild(avatar);
+  }
+
+  const meta = document.createElement("div");
+  const name = document.createElement("div");
+  meta.className = "meta";
+  name.className = "nm";
+  name.textContent = author;
+  meta.appendChild(name);
+  header.append(meta, createGoogleMark());
+
+  const stars = document.createElement("div");
+  const rating = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 5)));
+  stars.className = "rstars";
+  stars.setAttribute("aria-label", `${rating} out of 5 stars`);
+  for (let star = 0; star < rating; star += 1) stars.appendChild(createReviewStar());
+  const when = document.createElement("span");
+  when.className = "when";
+  when.textContent = review.relativeTime ? `· ${review.relativeTime}` : "";
+  stars.appendChild(when);
+
+  const quote = document.createElement("p");
+  quote.textContent = review.text;
+  card.append(header, stars, quote);
+  return card;
+}
+
+function renderGoogleReviewTrack(track, reviews) {
+  const fragment = document.createDocumentFragment();
+  [reviews, reviews].forEach((set) => {
+    set.forEach((review, index) => fragment.appendChild(createGoogleReviewCard(review, index)));
+  });
+  track.replaceChildren(fragment);
+}
+
+function loadGoogleReviewsJsonp(endpoint) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `oviGoogleReviews_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const script = document.createElement("script");
+    const timeout = window.setTimeout(() => finish(new Error("Google reviews request timed out.")), 12000);
+    const finish = (error, payload) => {
+      window.clearTimeout(timeout);
+      script.remove();
+      delete window[callbackName];
+      if (error) reject(error);
+      else resolve(payload);
+    };
+
+    try {
+      const url = new URL(endpoint, document.baseURI);
+      url.searchParams.set("callback", callbackName);
+      url.searchParams.set("_", Date.now().toString());
+      window[callbackName] = (payload) => finish(null, payload);
+      script.src = url.toString();
+      script.async = true;
+      script.onerror = () => finish(new Error("Google reviews request failed."));
+      document.head.appendChild(script);
+    } catch (error) {
+      finish(error);
+    }
+  });
+}
+
+async function initGoogleReviews() {
+  const section = document.querySelector("#reviews[data-google-reviews-endpoint]");
+  if (!section) return;
+
+  const endpoint = section.dataset.googleReviewsEndpoint.trim() || window.OVI_GOOGLE_REVIEWS_URL || "";
+  if (!endpoint) return;
+
+  const status = section.querySelector("[data-google-reviews-status]");
+  const description = section.querySelector("[data-google-reviews-description]");
+  if (status) status.textContent = "Loading live Google reviews…";
+
+  try {
+    const payload = await loadGoogleReviewsJsonp(endpoint);
+    const reviews = Array.isArray(payload?.reviews)
+      ? payload.reviews.filter((review) => review && review.text && review.author)
+      : [];
+    if (payload?.ok === false || !reviews.length) throw new Error(payload?.error || "No Google reviews returned.");
+
+    const reviewUrl = payload.reviewUrl || section.querySelector(".gr-link")?.href || "https://www.google.com/maps";
+    const firstTrack = section.querySelector("#gr-track-1");
+    const secondTrack = section.querySelector("#gr-track-2");
+    if (!firstTrack || !secondTrack) return;
+    renderGoogleReviewTrack(firstTrack, reviews);
+    renderGoogleReviewTrack(secondTrack, [...reviews].reverse());
+
+    const rating = Number(payload.rating);
+    const total = Number(payload.totalReviews);
+    const ratingNode = section.querySelector(".gr-score .num");
+    const starsNode = section.querySelector(".gr-score .stars");
+    const countNode = section.querySelector(".gr-score .count");
+    const allReviewsLink = section.querySelector(".gr-link");
+    if (Number.isFinite(rating) && ratingNode) ratingNode.textContent = rating.toFixed(1);
+    if (Number.isFinite(rating) && starsNode) starsNode.setAttribute("aria-label", `${rating.toFixed(1)} of 5`);
+    if (Number.isFinite(total) && countNode) {
+      countNode.textContent = "based on ";
+      const strong = document.createElement("strong");
+      strong.textContent = `${total.toLocaleString("en-IN")} Google reviews`;
+      countNode.appendChild(strong);
+    }
+    if (allReviewsLink) allReviewsLink.href = reviewUrl;
+    if (status) status.textContent = "Live from Google Business Profile";
+    if (description) description.textContent = "Loaded live from our public Google Business profile. Review text and ratings are displayed as published on Google.";
+    section.dataset.googleReviewsLive = "true";
+  } catch (error) {
+    if (status) status.textContent = "Google Business profile reviews";
+    console.warn("Live Google reviews unavailable; showing saved reviews.", error);
+  }
+}
+document.addEventListener("DOMContentLoaded", initGoogleReviews);
 
 function sortStudentWorkByBatch() {
   document.querySelectorAll(".student-work-grid--flow").forEach((grid) => {
@@ -275,6 +585,20 @@ const mobileMenu = document.getElementById("mobile-menu");
 const topbarInner = document.querySelector(".topbar-inner");
 const navDropdown = document.querySelector(".nav-dropdown");
 const navDropdownToggle = document.querySelector(".nav-dropdown-toggle");
+const navDropdownMenu = document.querySelector(".nav-dropdown-menu");
+
+if (navDropdownMenu && !navDropdownMenu.id) {
+  navDropdownMenu.id = "nav-courses-menu";
+}
+
+if (navDropdownToggle) {
+  navDropdownToggle.setAttribute("aria-controls", navDropdownMenu?.id || "nav-courses-menu");
+}
+
+const primaryNav = document.querySelector("header.nav .nav-links");
+if (primaryNav && !primaryNav.getAttribute("aria-label")) {
+  primaryNav.setAttribute("aria-label", "Primary");
+}
 
 function initTopbarTicker() {
   if (!topbarInner || prefersReducedMotion.matches) {
@@ -397,16 +721,34 @@ if (nav || progress) {
 runWhenIdle(initTopbarTicker, 900);
 
 if (menuBtn && mobileMenu) {
-  menuBtn.addEventListener("click", () => {
-    const isOpen = mobileMenu.classList.toggle("open");
+  const setMobileMenuState = (isOpen) => {
+    mobileMenu.classList.toggle("open", isOpen);
+    mobileMenu.hidden = !isOpen;
+    mobileMenu.setAttribute("aria-hidden", String(!isOpen));
     menuBtn.setAttribute("aria-expanded", String(isOpen));
+  };
+
+  menuBtn.setAttribute("aria-controls", mobileMenu.id || "mobile-menu");
+  if (!menuBtn.hasAttribute("aria-expanded")) {
+    menuBtn.setAttribute("aria-expanded", "false");
+  }
+  setMobileMenuState(mobileMenu.classList.contains("open"));
+
+  menuBtn.addEventListener("click", () => {
+    setMobileMenuState(!mobileMenu.classList.contains("open"));
   });
 
   mobileMenu.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
-      mobileMenu.classList.remove("open");
-      menuBtn.setAttribute("aria-expanded", "false");
+      setMobileMenuState(false);
     });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mobileMenu.classList.contains("open")) {
+      setMobileMenuState(false);
+      menuBtn.focus();
+    }
   });
 }
 
@@ -417,6 +759,9 @@ if (navDropdown && navDropdownToggle) {
   };
 
   navDropdownToggle.addEventListener("click", (e) => {
+    if (navDropdownToggle.tagName.toLowerCase() === "a") {
+      return;
+    }
     e.preventDefault();
     const isOpen = navDropdown.classList.toggle("open");
     navDropdownToggle.setAttribute("aria-expanded", String(isOpen));
@@ -727,6 +1072,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let previousFocus = null;
   let countdownTimer = null;
+  const modalPanel = modal.querySelector(".promo-modal__panel");
   const deadlineTime = campaign.deadline ? new Date(campaign.deadline).getTime() : 0;
   const countdown = {
     root: modal.querySelector("[data-promo-countdown]"),
@@ -776,6 +1122,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeButton = modal.querySelector(".promo-modal__close");
     if (closeButton) {
       closeButton.focus();
+    } else if (modalPanel instanceof HTMLElement) {
+      modalPanel.focus();
     }
   };
 
@@ -798,10 +1146,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && modal.classList.contains("open")) {
-      closePromo();
+    if (!modal.classList.contains("open")) {
+      return;
     }
+    if (event.key === "Escape") {
+      closePromo();
+      return;
+    }
+    trapFocusInContainer(event, modalPanel);
   });
+
+  if (modalPanel instanceof HTMLElement && !modalPanel.hasAttribute("tabindex")) {
+    modalPanel.setAttribute("tabindex", "-1");
+  }
 
   window.setTimeout(openPromo, Number(campaign.showDelay) || 0);
 });
@@ -868,18 +1225,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <form id="demo-form" action="https://docs.google.com/forms/d/e/1FAIpQLSe-HnVltY_M0mU0ULojI-HW_uQzhaoQHH2RswICpBKHojmRag/formResponse" method="POST" novalidate accept-charset="UTF-8">
                   <div class="input-group">
+                    <label class="sr-only" for="name">Full name</label>
                     <input type="text" id="name" name="entry.2006584646" placeholder="Full Name" aria-label="Full name" autocomplete="name" minlength="2" maxlength="80" required />
                   </div>
 
                   <div class="input-group">
+                    <label class="sr-only" for="email">Email address</label>
                     <input type="email" id="email" name="entry.1227599783" placeholder="Email Address" aria-label="Email address" autocomplete="email" maxlength="254" required />
                   </div>
 
                   <div class="input-group">
+                    <label class="sr-only" for="phone">10-digit phone number</label>
                     <input type="tel" id="phone" name="entry.489954529" placeholder="10-digit Phone Number" aria-label="10-digit phone number" autocomplete="tel" inputmode="numeric" pattern="[0-9]{10}" minlength="10" maxlength="10" required />
                   </div>
 
                   <div class="input-group">
+                    <label class="sr-only" for="preferred-course">Preferred course</label>
                     <select id="preferred-course" name="entry.376165871" aria-label="Preferred course" autocomplete="off" required>
                       <option value="">Preferred course</option>
                       <option>UX UI + Ai Vibe Design</option>
@@ -888,6 +1249,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   </div>
 
                   <div class="input-group">
+                    <label class="sr-only" for="message">Your goals or background</label>
                     <textarea id="message" name="entry.1824922767" placeholder="Tell us about your goals or background..." aria-label="Your goals or background" minlength="10" maxlength="1000" required></textarea>
                   </div>
 
@@ -906,12 +1268,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("demo-form");
     const status = document.getElementById("status");
+    const modalPanel = modal.querySelector(".demo-modal__panel");
 
     if (!form || !modal) {
       return;
     }
 
     let modalTrigger = null;
+
+    const ensureFieldLabel = (fieldId, text) => {
+      if (form.querySelector(`label[for="${fieldId}"]`)) {
+        return;
+      }
+      const field = form.querySelector(`#${fieldId}`);
+      if (!(field instanceof HTMLElement) || !(field.parentElement instanceof HTMLElement)) {
+        return;
+      }
+      const label = document.createElement("label");
+      label.className = "sr-only";
+      label.htmlFor = fieldId;
+      label.textContent = text;
+      field.parentElement.insertBefore(label, field);
+    };
+
+    ensureFieldLabel("name", "Full name");
+    ensureFieldLabel("email", "Email address");
+    ensureFieldLabel("phone", "10-digit phone number");
+    ensureFieldLabel("preferred-course", "Preferred course");
+    ensureFieldLabel("message", "Your goals or background");
 
     const openModal = (trigger) => {
       modalTrigger = trigger || document.activeElement;
@@ -923,6 +1307,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const firstField = form.querySelector("input, select, textarea, button");
       if (firstField) {
         firstField.focus();
+      } else if (modalPanel instanceof HTMLElement) {
+        modalPanel.focus();
       }
     };
 
@@ -948,10 +1334,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("open")) {
-        closeModal();
+      if (!modal.classList.contains("open")) {
+        return;
       }
+      if (e.key === "Escape") {
+        closeModal();
+        return;
+      }
+      trapFocusInContainer(e, modalPanel);
     });
+
+    if (modalPanel instanceof HTMLElement && !modalPanel.hasAttribute("tabindex")) {
+      modalPanel.setAttribute("tabindex", "-1");
+    }
 
     bindGoogleFormSubmission(form, {
       submitButtonSelector: "#submitBtn",

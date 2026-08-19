@@ -16,6 +16,9 @@ Redirect 301 /student-portfolio-chennai.html /ux-ui-student-portfolio-chennai.ht
 Redirect 301 /ux-ui-design-course-chennai.html /ux-ui-design-course-in-chennai.html
 Redirect 301 /web-design-course-chennai.html /web-design-course-in-chennai.html
 
+RedirectMatch 301 ^/courses/?$ /design-courses-in-chennai.html
+RedirectMatch 301 ^/design-courses-in-chennai/?$ /design-courses-in-chennai.html
+
 # Serve the branded 404 page for every path that is not a real file or folder.
 # The "-" target keeps the original missing URL in the address bar, while
 # ErrorDocument renders /404.html and preserves the correct HTTP 404 status.

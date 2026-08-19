@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ovi Design Academy Hero Section</title>
+  <meta name="description" content="Standalone hero section for Ovi Design Academy." />
+  <link rel="preload" as="image" href="image/hero-section/IMG_0207.webp" fetchpriority="high" />
+  <style>
+    :root {
+      --ink: #1a1830;
+      --cream: #ffffff;
+      --muted: #d6d3e6;
+      --blue: #07a4ff;
+      --lime: #ffa45f;
+      --border: rgba(255, 255, 255, .18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    h1,
+    p {
+      margin: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(255, 164, 95, .45);
+      outline-offset: 4px;
+    }
+
+    .container-x {
+      width: 100%;
+      max-width: 85rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-sliders {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .vslider {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vtrack {
+      display: flex;
+      flex-direction: column;
+      animation: vscrollUp 26s linear infinite;
+      will-change: transform;
+    }
+
+    .vitem {
+      flex: none;
+      position: relative;
+    }
+
+    .vitem img {
+      width: 100%;
+      height: 50vh;
+      min-height: 260px;
+      object-fit: cover;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(10, 8, 30, .9) 0%, rgba(10, 8, 30, .68) 50%, rgba(10, 8, 30, .52) 100%),
+        radial-gradient(circle at 15% 50%, rgba(7, 164, 255, .14), transparent 34%);
+      box-shadow: inset 0 0 120px rgba(10, 8, 30, .62);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+
+    .hero-trustmarker {
+      width: min(100%, 280px);
+      height: auto;
+    }
+
+    .hero h1 {
+      max-width: 12ch;
+      margin-top: 1.5rem;
+      font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(3rem, 8vw, 5.75rem);
+      font-weight: 750;
+      line-height: .98;
+      letter-spacing: 0;
+      color: #fff;
+    }
+
+    .hero h1 span {
+      display: block;
+      transition: opacity .4s ease, transform .4s ease;
+    }
+
+    .hero h1 .line2 {
+      color: var(--lime);
+      font-style: italic;
+    }
+
+    .hero .body {
+      max-width: 38rem;
+      margin-top: 1.4rem;
+      color: rgba(255, 255, 255, .76);
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      line-height: 1.75;
+      transition: opacity .4s ease, transform .4s ease;
+    }
+
+    .key-info {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .55rem;
+      max-width: min(100%, 52rem);
+      margin-top: 1.25rem;
+      padding: .62rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .1);
+      color: rgba(255, 255, 255, .86);
+      font-size: .8rem;
+      font-weight: 650;
+      backdrop-filter: blur(10px);
+    }
+
+    .key-info .d {
+      color: rgba(255, 255, 255, .32);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 1rem 1.1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 56px;
+      align-items: center;
+      justify-content: center;
+      gap: .55rem;
+      border-radius: 999px;
+      padding: .9rem 1.55rem;
+      font-size: .9rem;
+      font-weight: 750;
+      transition: transform .25s ease, background .25s ease, border-color .25s ease, color .25s ease;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      transition: transform .25s ease;
+    }
+
+    .btn-primary {
+      background: var(--lime);
+      color: var(--ink);
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:hover svg {
+      transform: rotate(45deg);
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(255, 255, 255, .42);
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(255, 255, 255, .68);
+      background: rgba(255, 255, 255, .14);
+      transform: translateY(-1px);
+    }
+
+    .hero-controls {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: 1.15rem;
+    }
+
+    .slide-dots {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .slide-dots button {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      padding: 0;
+      border-radius: 999px;
+    }
+
+    .slide-dots button::before {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .55);
+      transition: width .3s ease, background .3s ease;
+    }
+
+    .slide-dots button.active {
+      width: 40px;
+    }
+
+    .slide-dots button.active::before {
+      width: 40px;
+      background: #fff;
+    }
+
+    .hero-nav {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+    }
+
+    .hero-nav-btn {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .hero-nav-btn svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .hero-nav-btn:hover {
+      border-color: rgba(255, 255, 255, .48);
+      background: rgba(255, 255, 255, .16);
+      transform: translateY(-1px);
+    }
+
+    @keyframes vscrollUp {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(-50%);
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container-x {
+        padding: 0 1.5rem;
+      }
+
+      .hero-content {
+        padding-bottom: 7rem;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        min-height: 780px;
+      }
+
+      .hero-sliders {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-sliders .vslider:nth-child(3) {
+        display: none;
+      }
+
+      .hero-overlay {
+        background: linear-gradient(90deg, rgba(10, 8, 30, .94), rgba(10, 8, 30, .62));
+      }
+
+      .hero h1 {
+        max-width: 11ch;
+      }
+
+      .key-info {
+        border-radius: 18px;
+      }
+
+      .btn-row {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: min(100%, 320px);
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-label="Ovi Design Academy hero section">
+      <div class="hero-sliders" id="hero-sliders" aria-hidden="true">
+        <div class="vslider">
+          <div class="vtrack">
+            <div class="vitem"><img src="image/hero-section/IMG_0207.webp" alt="" fetchpriority="high" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_0943.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_0491.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_5354.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_0207.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_0943.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_0491.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_5354.webp" alt="" decoding="async" /></div>
+          </div>
+        </div>
+
+        <div class="vslider">
+          <div class="vtrack" style="animation-delay:-9s;animation-duration:30s">
+            <div class="vitem"><img src="image/moving-gallery/IMG-20251010-WA0012.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_0520.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_5852.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_5237.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG-20251010-WA0012.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_0520.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG_5852.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_5237.webp" alt="" decoding="async" /></div>
+          </div>
+        </div>
+
+        <div class="vslider">
+          <div class="vtrack" style="animation-delay:-16s;animation-duration:24s">
+            <div class="vitem"><img src="image/hero-section/IMG_9287.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG-20251129-WA0025.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/322df1c2-5d2c-4c95-a2af-490a051300bb.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/WhatsApp Image 2025-10-24 at 19.21.30_75776a67.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/IMG_9287.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/IMG-20251129-WA0025.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/hero-section/322df1c2-5d2c-4c95-a2af-490a051300bb.webp" alt="" decoding="async" /></div>
+            <div class="vitem"><img src="image/moving-gallery/WhatsApp Image 2025-10-24 at 19.21.30_75776a67.webp" alt="" decoding="async" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <div class="container-x hero-content">
+        <img class="hero-trustmarker" src="image/hero-trustmarker.webp" alt="Trust markers" fetchpriority="high" decoding="async" />
+        <h1>
+          <span id="h-t1">Upscale your career</span>
+          <span id="h-t2" class="line2">Graphic to UX + Ai</span>
+        </h1>
+        <p class="body" id="h-body">Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications.</p>
+
+        <div class="key-info" id="h-trust">
+          <span>25+ Years Experience</span><span class="d">|</span><span>Live Projects</span><span class="d">|</span><span>Portfolio</span><span class="d">|</span><span>AI Tools</span><span class="d">|</span><span>No Coding Required</span>
+        </div>
+
+        <div class="btn-row">
+          <a href="index.html#cta" class="btn btn-primary">
+            <span id="h-primary">Start Your Free Demo</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
+          <a href="index.html#courses" class="btn btn-outline" id="h-secondary">
+            <svg id="h-secondary-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="h-secondary-text">Explore Courses</span>
+          </a>
+        </div>
+
+        <div class="hero-controls">
+          <div id="slide-dots" class="slide-dots" aria-label="Hero slides">
+            <button type="button" aria-label="Slide 1" class="active" data-slide-index="0"></button>
+            <button type="button" aria-label="Slide 2" data-slide-index="1"></button>
+            <button type="button" aria-label="Slide 3" data-slide-index="2"></button>
+          </div>
+          <div class="hero-nav" aria-label="Hero slide navigation">
+            <button type="button" class="hero-nav-btn" data-hero-prev aria-label="Previous slide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6"></path>
+              </svg>
+            </button>
+            <button type="button" class="hero-nav-btn" data-hero-next aria-label="Next slide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const prefersReducedMotion = typeof window.matchMedia === "function"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)")
+      : { matches: false };
+
+    const SLIDES = [
+      {
+        t1: "Upscale your career",
+        t2: "Graphic to UX + Ai",
+        body: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications."
+      },
+      {
+        t1: "AI-Powered UX/UI &",
+        t2: "Vibe Prototyping",
+        body: "Join Chennai's industry-focused UX/UI program and learn AI, Figma, research, prototyping, and design systems."
+      },
+      {
+        t1: "Don't Just Design,",
+        t2: "Build them with AI.",
+        body: "Learn UX/UI Design, AI Tools and Vibe Coding to turn your ideas into functional mobile and web apps without traditional coding.",
+        primaryCta: "Book Free Demo Class",
+        secondaryCta: {
+          text: "Talk to Mentor",
+          href: "https://wa.me/919444074941?text=Hi%20Ovi%20Design%20Academy%2C%20I%27d%20like%20to%20talk%20to%20a%20mentor%20about%20the%20AI-Powered%20UX%2FUI%20%2B%20Vibe%20Coding%20course.",
+          external: true
+        }
+      }
+    ];
+
+    const HERO_PRIMARY_CTA = "Start Your Free Demo";
+    const HERO_SECONDARY_CTA = "Explore Courses";
+    const HERO_SLIDE_INTERVAL = 5000;
+    const HERO_SECONDARY_ICON_PLAY = {
+      html: '<polygon points="5 3 19 12 5 21 5 3"></polygon>',
+      fill: "currentColor",
+      stroke: "none"
+    };
+    const HERO_SECONDARY_ICON_CHAT = {
+      html: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
+      fill: "none",
+      stroke: "currentColor"
+    };
+
+    let currentSlide = 0;
+    let heroSlideTimer = null;
+
+    function renderSlide(index) {
+      const t1 = document.getElementById("h-t1");
+      const t2 = document.getElementById("h-t2");
+      const body = document.getElementById("h-body");
+      const primary = document.getElementById("h-primary");
+      const secondary = document.getElementById("h-secondary");
+      const secondaryIcon = document.getElementById("h-secondary-icon");
+      const secondaryText = document.getElementById("h-secondary-text");
+      const dots = document.querySelectorAll(".slide-dots button");
+
+      if (!t1 || !t2 || !body || !primary || !secondary || !dots.length) return;
+
+      const slide = SLIDES[index];
+      [t1, t2, body].forEach((element) => {
+        element.style.opacity = "0";
+        element.style.transform = "translateY(10px)";
+      });
+
+      window.setTimeout(() => {
+        t1.textContent = slide.t1;
+        t2.textContent = slide.t2;
+        body.textContent = slide.body;
+        [t1, t2, body].forEach((element) => {
+          element.style.opacity = "1";
+          element.style.transform = "none";
+        });
+      }, 220);
+
+      primary.textContent = slide.primaryCta || HERO_PRIMARY_CTA;
+
+      const secondaryCta = slide.secondaryCta;
+      secondary.href = secondaryCta ? secondaryCta.href : "index.html#courses";
+      if (secondaryCta && secondaryCta.external) {
+        secondary.setAttribute("target", "_blank");
+        secondary.setAttribute("rel", "noopener");
+      } else {
+        secondary.removeAttribute("target");
+        secondary.removeAttribute("rel");
+      }
+
+      secondaryText.textContent = secondaryCta ? secondaryCta.text : HERO_SECONDARY_CTA;
+
+      const icon = secondaryCta && secondaryCta.external ? HERO_SECONDARY_ICON_CHAT : HERO_SECONDARY_ICON_PLAY;
+      secondaryIcon.innerHTML = icon.html;
+      secondaryIcon.setAttribute("fill", icon.fill);
+      secondaryIcon.setAttribute("stroke", icon.stroke);
+      secondaryIcon.setAttribute("stroke-width", "2");
+      secondaryIcon.setAttribute("stroke-linecap", "round");
+      secondaryIcon.setAttribute("stroke-linejoin", "round");
+
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle("active", dotIndex === index);
+      });
+    }
+
+    function startHeroSlider() {
+      if (heroSlideTimer || prefersReducedMotion.matches) return;
+      heroSlideTimer = window.setInterval(() => {
+        currentSlide = (currentSlide + 1) % SLIDES.length;
+        renderSlide(currentSlide);
+      }, HERO_SLIDE_INTERVAL);
+    }
+
+    function stopHeroSlider() {
+      if (!heroSlideTimer) return;
+      window.clearInterval(heroSlideTimer);
+      heroSlideTimer = null;
+    }
+
+    function setHeroSlide(index) {
+      currentSlide = (index + SLIDES.length) % SLIDES.length;
+      renderSlide(currentSlide);
+      stopHeroSlider();
+      startHeroSlider();
+    }
+
+    document.querySelectorAll(".slide-dots button").forEach((dot) => {
+      dot.addEventListener("click", () => {
+        const slideIndex = Number(dot.dataset.slideIndex);
+        if (!Number.isNaN(slideIndex)) setHeroSlide(slideIndex);
+      });
+    });
+
+    document.querySelector("[data-hero-prev]").addEventListener("click", () => {
+      setHeroSlide(currentSlide - 1);
+    });
+
+    document.querySelector("[data-hero-next]").addEventListener("click", () => {
+      setHeroSlide(currentSlide + 1);
+    });
+
+    const heroContent = document.querySelector(".hero-content");
+    if (heroContent && !prefersReducedMotion.matches) {
+      heroContent.addEventListener("mouseenter", stopHeroSlider);
+      heroContent.addEventListener("mouseleave", startHeroSlider);
+    }
+
+    renderSlide(0);
+    startHeroSlider();
+  </script>
+</body>
+</html>
