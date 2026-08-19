@@ -4,20 +4,22 @@ ErrorDocument 404 /404.html
 Redirect 301 /ux-ui-design.html /ux-ui-design-course-in-chennai.html
 Redirect 301 /web-design.html /web-design-course-in-chennai.html
 Redirect 301 /graphic-design.html /graphic-design-course-in-chennai.html
-Redirect 301 /courses.html /design-courses-in-chennai.html
+Redirect 301 /courses.html /ux-ui-design-course-in-chennai.html
 Redirect 301 /students-works.html /ux-ui-student-portfolio-chennai.html
 Redirect 301 /faq.html /ux-ui-course-faqs-chennai.html
 Redirect 301 /about.html /about-ovi-design-academy-chennai.html
 Redirect 301 /contact.html /contact-ovi-design-academy-chennai.html
-Redirect 301 /design-courses-chennai.html /design-courses-in-chennai.html
+Redirect 301 /design-courses-chennai.html /ux-ui-design-course-in-chennai.html
 Redirect 301 /graphic-design-course-chennai.html /graphic-design-course-in-chennai.html
 Redirect 301 /life-at-ovi.html /life-at-ovi-design-academy-chennai.html
 Redirect 301 /student-portfolio-chennai.html /ux-ui-student-portfolio-chennai.html
 Redirect 301 /ux-ui-design-course-chennai.html /ux-ui-design-course-in-chennai.html
 Redirect 301 /web-design-course-chennai.html /web-design-course-in-chennai.html
+Redirect 301 /all-design-course.html /all-design-courses.html
+Redirect 301 /all-design-courses /all-design-courses.html
+Redirect 301 /design-courses-in-chennai.html /all-design-courses.html
 
-RedirectMatch 301 ^/courses/?$ /design-courses-in-chennai.html
-RedirectMatch 301 ^/design-courses-in-chennai/?$ /design-courses-in-chennai.html
+RedirectMatch 301 ^/courses/?$ /ux-ui-design-course-in-chennai.html
 
 # Serve the branded 404 page for every path that is not a real file or folder.
 # The "-" target keeps the original missing URL in the address bar, while
