@@ -12,6 +12,7 @@
     "contact-ovi-design-academy-chennai.html",
     "faq-ovi-design-academy.html",
     "life-at-ovi-design-academy-chennai.html",
+    "new-hero.html",
     "students-works-ovi-design-academy.html",
     "ux-ui-masterclass-ai-vibe-design-ovi-design-academy.html"
   ]);
@@ -1702,4 +1703,174 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initToolsCarousel();
   initForms();
+});
+
+// Index page hero slider.
+document.addEventListener("DOMContentLoaded", () => {
+  const hero = document.querySelector("[data-index-hero]");
+  if (!hero) return;
+
+  const slides = [
+    {
+      titleOne: "Upscale your career",
+      titleTwo: "Graphic to UX + Ai",
+      description: "Learn UX/UI Design, AI-powered workflows and Vibe Coding to turn your ideas into functional mobile and web applications."
+    },
+    {
+      titleOne: "AI-Powered UX/UI &",
+      titleTwo: "Vibe Prototyping",
+      description: "Join Chennai's industry-focused UX/UI program and learn AI, Figma, research, prototyping, and design systems."
+    },
+    {
+      titleOne: "Don't Just Design,",
+      titleTwo: "Build them with AI.",
+      description: "Learn UX/UI Design, AI Tools and Vibe Coding to turn your ideas into functional mobile and web apps without traditional coding.",
+      primaryText: "Book Free Demo Class",
+      secondaryText: "Talk to Mentor",
+      secondaryHref: "https://wa.me/919444074941?text=Hi%20Ovi%20Design%20Academy%2C%20I%27d%20like%20to%20talk%20to%20a%20mentor%20about%20the%20AI-Powered%20UX%2FUI%20%2B%20Vibe%20Coding%20course.",
+      secondaryExternal: true
+    }
+  ];
+
+  const titleOne = hero.querySelector("[data-index-title-one]");
+  const titleTwo = hero.querySelector("[data-index-title-two]");
+  const description = hero.querySelector("[data-index-description]");
+  const primaryText = hero.querySelector("[data-index-primary-text]");
+  const secondary = hero.querySelector("[data-index-secondary]");
+  const secondaryText = hero.querySelector("[data-index-secondary-text]");
+  const secondaryIcon = hero.querySelector("[data-index-secondary-icon]");
+  const dots = Array.from(hero.querySelectorAll("[data-index-slide]"));
+  const backgrounds = Array.from(hero.querySelectorAll("[data-index-background]"));
+  const previous = hero.querySelector("[data-index-prev]");
+  const next = hero.querySelector("[data-index-next]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let current = 0;
+  let timer = null;
+  let touchStartX = 0;
+  let transitionFrame = null;
+  let parallaxFrame = null;
+  let targetParallaxX = 0;
+  let targetParallaxY = 0;
+  let currentParallaxX = 0;
+  let currentParallaxY = 0;
+
+  const drawParallax = () => {
+    currentParallaxX += (targetParallaxX - currentParallaxX) * 0.14;
+    currentParallaxY += (targetParallaxY - currentParallaxY) * 0.14;
+    hero.style.setProperty("--hero-bg-x", `${(-currentParallaxX * 13).toFixed(2)}px`);
+    hero.style.setProperty("--hero-bg-y", `${(-currentParallaxY * 9).toFixed(2)}px`);
+    if (Math.abs(targetParallaxX - currentParallaxX) > 0.002 || Math.abs(targetParallaxY - currentParallaxY) > 0.002) {
+      parallaxFrame = window.requestAnimationFrame(drawParallax);
+    } else {
+      parallaxFrame = null;
+    }
+  };
+
+  const scheduleParallax = () => {
+    if (parallaxFrame === null) parallaxFrame = window.requestAnimationFrame(drawParallax);
+  };
+
+  const resetParallax = () => {
+    targetParallaxX = 0;
+    targetParallaxY = 0;
+    hero.classList.remove("is-parallax-active");
+    scheduleParallax();
+  };
+
+  const render = (index) => {
+    current = (index + slides.length) % slides.length;
+    const slide = slides[current];
+    hero.dataset.activeSlide = String(current);
+    titleOne.textContent = slide.titleOne;
+    titleTwo.textContent = slide.titleTwo;
+    description.textContent = slide.description;
+    primaryText.textContent = slide.primaryText || "Start Your Free Demo";
+    secondaryText.textContent = slide.secondaryText || "Explore Courses";
+    secondary.href = slide.secondaryHref || "all-course-ux-ui-ovi-design-academy.html";
+
+    if (slide.secondaryExternal) {
+      secondary.target = "_blank";
+      secondary.rel = "noopener";
+      secondaryIcon.setAttribute("fill", "none");
+      secondaryIcon.setAttribute("stroke", "currentColor");
+      secondaryIcon.innerHTML = '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>';
+    } else {
+      secondary.removeAttribute("target");
+      secondary.removeAttribute("rel");
+      secondaryIcon.setAttribute("fill", "currentColor");
+      secondaryIcon.setAttribute("stroke", "none");
+      secondaryIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+    }
+
+    backgrounds.forEach((background, itemIndex) => background.classList.toggle("is-active", itemIndex === current));
+    dots.forEach((dot, itemIndex) => {
+      const active = itemIndex === current;
+      dot.classList.toggle("active", active);
+      dot.setAttribute("aria-current", String(active));
+    });
+
+    if (!reducedMotion.matches) {
+      if (transitionFrame !== null) window.cancelAnimationFrame(transitionFrame);
+      hero.classList.add("is-preparing-slide");
+      void hero.offsetWidth;
+      transitionFrame = window.requestAnimationFrame(() => {
+        hero.classList.remove("is-preparing-slide");
+        transitionFrame = null;
+      });
+    }
+  };
+
+  const stopAutoplay = () => {
+    if (timer !== null) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  };
+  const startAutoplay = () => {
+    stopAutoplay();
+    if (!reducedMotion.matches) timer = window.setInterval(() => render(current + 1), 5000);
+  };
+  const select = (index) => {
+    render(index);
+    startAutoplay();
+  };
+
+  dots.forEach((dot) => dot.addEventListener("click", () => select(Number(dot.dataset.indexSlide))));
+  previous.addEventListener("click", () => select(current - 1));
+  next.addEventListener("click", () => select(current + 1));
+  hero.addEventListener("mouseenter", stopAutoplay);
+  hero.addEventListener("mouseleave", startAutoplay);
+  hero.addEventListener("mousemove", (event) => {
+    if (reducedMotion.matches) return;
+    const bounds = hero.getBoundingClientRect();
+    targetParallaxX = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
+    targetParallaxY = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
+    hero.classList.add("is-parallax-active");
+    scheduleParallax();
+  });
+  hero.addEventListener("mouseleave", resetParallax);
+  hero.addEventListener("focusin", stopAutoplay);
+  hero.addEventListener("focusout", (event) => {
+    if (!hero.contains(event.relatedTarget)) startAutoplay();
+  });
+  hero.addEventListener("touchstart", (event) => {
+    touchStartX = event.changedTouches[0].clientX;
+  }, { passive: true });
+  hero.addEventListener("touchend", (event) => {
+    const distance = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(distance) > 45) select(distance < 0 ? current + 1 : current - 1);
+  }, { passive: true });
+  document.addEventListener("keydown", (event) => {
+    const bounds = hero.getBoundingClientRect();
+    if (bounds.bottom <= 0 || bounds.top >= window.innerHeight) return;
+    if (event.key === "ArrowLeft") select(current - 1);
+    if (event.key === "ArrowRight") select(current + 1);
+  });
+  reducedMotion.addEventListener("change", () => {
+    resetParallax();
+    startAutoplay();
+  });
+
+  render(0);
+  startAutoplay();
 });

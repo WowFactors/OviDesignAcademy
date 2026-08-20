@@ -1,3 +1,4 @@
+<<<<<<< ours
 # Design QA — Interactive Ovi 404 Page
 
 - Source visual truth: latest user-provided full-width 404 placement reference in the conversation, refined by the request for shared site chrome, separate image elements, and subtle motion.
@@ -59,3 +60,34 @@ The separate assets were visually inspected after background removal. The direct
 - Fix any P0/P1/P2 visual differences and repeat the comparison.
 
 final result: blocked
+=======
+# Design QA - Responsive Hero
+
+- Source visual truth: existing Ovi desktop hero and the user's requirement for a clean mobile composition without text/image overlap.
+- Implementation: `hero-new/new-hero.html`.
+- Browser-rendered implementation: reviewed at the headless browser's 500 x 844 minimum mobile breakpoint before the temporary capture was removed from the production folder.
+- State: first carousel slide with mobile navigation closed.
+
+## Evidence
+
+The verified mobile view contains the shared topbar and header, visible hamburger control, balanced four-line headline, readable description, two full-width CTAs, three centered trust markers, a separate cropped illustration panel, and visible carousel controls. The artwork does not overlap the copy or controls.
+
+The second and third slides use smaller mobile headline sizing to accommodate their longer course names. All three hero assets share the same 1672 x 941 dimensions and use the same bounded mobile image treatment.
+
+## Required fidelity surfaces
+
+- Fonts and typography: Instrument Sans is preserved with responsive display sizing, balanced wrapping, and compact mobile body copy.
+- Spacing and layout rhythm: content and artwork occupy separate vertical zones; buttons, trust markers, and controls remain within the mobile frame.
+- Colors and visual tokens: existing Ovi orange, blue, pale background, and shared navigation styling are preserved.
+- Image quality and asset fidelity: original hero assets are retained with `object-fit: cover` and controlled mobile focal positioning.
+- Copy and content: hero copy, navigation, marquee, footer, CTAs, and carousel content remain intact.
+
+## Verification
+
+- `script.js` passes Node syntax validation.
+- Responsive breakpoints cover 720px, 560px, and 380px widths.
+- The complete 500 x 844 browser capture was visually inspected.
+- Temporary browser profiles and screenshot artifacts were removed from the production folder after verification.
+
+final result: passed
+>>>>>>> theirs
