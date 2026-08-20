@@ -6,13 +6,14 @@
     "index.html",
     "404.html",
     "about-ovi-design-academy-chennai.html",
-    "advanced-ux-ui-ai-course-chennai.html",
+    "all-course-ux-ui-ovi-design-academy.html",
+    "advanced-ux-ui-ai-leadership-program-ovi-design-academy.html",
     "compare-ux-ui-courses-chennai.html",
     "contact-ovi-design-academy-chennai.html",
+    "faq-ovi-design-academy.html",
     "life-at-ovi-design-academy-chennai.html",
-    "ux-ui-course-faqs-chennai.html",
-    "ux-ui-design-course-in-chennai.html",
-    "ux-ui-student-portfolio-chennai.html"
+    "students-works-ovi-design-academy.html",
+    "ux-ui-masterclass-ai-vibe-design-ovi-design-academy.html"
   ]);
 
   const pageNameFromPath = (pathname) => {
