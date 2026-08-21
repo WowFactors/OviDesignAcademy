@@ -8,6 +8,6 @@ Moved file:
 
 - `hero-section.html`
 
-Page backup:
+Restored page:
 
-- `index-before-new-hero.html` — index page before the current hero was integrated.
+- `../Index-1.html` — index page before the current hero was integrated.

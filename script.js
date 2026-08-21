@@ -14,6 +14,8 @@
     "life-at-ovi-design-academy-chennai.html",
     "new-hero.html",
     "students-works-ovi-design-academy.html",
+    "hero-section.html",
+    "index-1.html",
     "ux-ui-masterclass-ai-vibe-design-ovi-design-academy.html"
   ]);
 
