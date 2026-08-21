@@ -1,31 +1,40 @@
-# Apache 301 redirects — old page URLs to new keyword-optimized URLs
+# Canonical clean-URL redirects.
 ErrorDocument 404 /404.html
 
-Redirect 301 /ux-ui-design.html /ux-ui-design-course-in-chennai.html
-Redirect 301 /web-design.html /web-design-course-in-chennai.html
-Redirect 301 /graphic-design.html /graphic-design-course-in-chennai.html
-Redirect 301 /courses.html /ux-ui-design-course-in-chennai.html
-Redirect 301 /students-works.html /ux-ui-student-portfolio-chennai.html
-Redirect 301 /faq.html /ux-ui-course-faqs-chennai.html
-Redirect 301 /about.html /about-ovi-design-academy-chennai.html
-Redirect 301 /contact.html /contact-ovi-design-academy-chennai.html
-Redirect 301 /design-courses-chennai.html /ux-ui-design-course-in-chennai.html
-Redirect 301 /graphic-design-course-chennai.html /graphic-design-course-in-chennai.html
-Redirect 301 /life-at-ovi.html /life-at-ovi-design-academy-chennai.html
-Redirect 301 /student-portfolio-chennai.html /ux-ui-student-portfolio-chennai.html
-Redirect 301 /ux-ui-design-course-chennai.html /ux-ui-design-course-in-chennai.html
-Redirect 301 /web-design-course-chennai.html /web-design-course-in-chennai.html
-Redirect 301 /all-design-course.html /all-design-courses.html
-Redirect 301 /all-design-courses /all-design-courses.html
-Redirect 301 /design-courses-in-chennai.html /all-design-courses.html
-
-RedirectMatch 301 ^/courses/?$ /ux-ui-design-course-in-chennai.html
-
-# Serve the branded 404 page for every path that is not a real file or folder.
-# The "-" target keeps the original missing URL in the address bar, while
-# ErrorDocument renders /404.html and preserves the correct HTTP 404 status.
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Never expose index.html, including inside canonical page folders.
+  RewriteCond %{THE_REQUEST} \s/+index\.html(?:[?\s]) [NC]
+  RewriteRule ^index\.html$ / [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+(.+/)index\.html(?:[?\s]) [NC]
+  RewriteRule ^(.+/)index\.html$ /$1 [R=301,L,NE]
+
+  # Current flat files and known historical aliases.
+  RewriteRule ^index-1\.html$ / [R=301,L,NC]
+  RewriteRule ^(?:ux-ui-masterclass-ai-vibe-design-ovi-design-academy|ux-ui-design-course-in-chennai|ux-ui-design-course-chennai|ux-ui-design)\.html$ /courses/ui-ux-design-course-chennai/ [R=301,L,NC]
+  RewriteRule ^(?:advanced-ux-ui-ai-leadership-program-ovi-design-academy|advanced-ux-ui-ai-course-chennai)\.html$ /courses/advanced-ui-ux-ai-leadership/ [R=301,L,NC]
+  RewriteRule ^compare-ux-ui-courses-chennai\.html$ /courses/compare-ui-ux-courses/ [R=301,L,NC]
+  RewriteRule ^(?:all-course-ux-ui-ovi-design-academy|all-design-course|all-design-courses|design-courses-in-chennai|design-courses-chennai|courses|web-design|web-design-course-chennai|web-design-course-in-chennai|graphic-design|graphic-design-course-chennai|graphic-design-course-in-chennai)\.html$ /courses/ [R=301,L,NC]
+  RewriteRule ^about-ovi-design-academy-chennai\.html$ /about/ [R=301,L,NC]
+  RewriteRule ^(?:students-works-ovi-design-academy|students-works|student-portfolio-chennai|ux-ui-student-portfolio-chennai)\.html$ /student-work/ [R=301,L,NC]
+  RewriteRule ^life-at-ovi-design-academy-chennai\.html$ /life-at-ovi/ [R=301,L,NC]
+  RewriteRule ^(?:faq-ovi-design-academy|faq|ux-ui-course-faqs-chennai)\.html$ /faq/ [R=301,L,NC]
+  RewriteRule ^contact-ovi-design-academy-chennai\.html$ /contact/ [R=301,L,NC]
+  RewriteRule ^about\.html$ /about/ [R=301,L,NC]
+  RewriteRule ^contact\.html$ /contact/ [R=301,L,NC]
+  RewriteRule ^life-at-ovi\.html$ /life-at-ovi/ [R=301,L,NC]
+  RewriteRule ^all-design-courses/?$ /courses/ [R=301,L,NC]
+
+  # Retire the indexed WordPress /new/ section without creating new duplicates.
+  RewriteRule ^new/?$ / [R=301,L,NC]
+  RewriteRule ^new/(?:about-us|about)/?$ /about/ [R=301,L,NC]
+  RewriteRule ^new/(?:contact-us|contact)/?$ /contact/ [R=301,L,NC]
+  RewriteRule ^new/(?:student[^/]*)/?$ /student-work/ [R=301,L,NC]
+  RewriteRule ^new/[^/]*course[^/]*/?$ /courses/ [R=301,L,NC]
+  RewriteRule ^new/.+$ /blog/ [R=301,L,NC]
+
+  # Serve the branded 404 page while preserving the missing URL and status.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ - [R=404,L]
