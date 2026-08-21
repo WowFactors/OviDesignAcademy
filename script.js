@@ -4,6 +4,8 @@
 (() => {
   const validPaths = new Set([
     "/",
+    "/index.html",
+    "/index-1.html",
     "/courses/",
     "/courses/ui-ux-design-course-chennai/",
     "/courses/advanced-ui-ux-ai-leadership/",
@@ -425,7 +427,7 @@ document.addEventListener("DOMContentLoaded", sortStudentWorkByBatch);
 const PROMO_BANNER = {
   enabled: true,
   id: "next-batch-demo-offer-2026",
-  image: "image/ux-ui-masterclass-visual-poster.jpg",
+  image: "/image/ux-ui-masterclass-visual-poster.jpg",
   imageAlt: "Students learning UX UI design on a laptop interface.",
   eyebrow: "Limited-time offer",
   title: "Next UX UI + Ai Vibe Design batch starts soon",
