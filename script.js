@@ -2,34 +2,33 @@
 // Apache handles real 404 responses through .htaccess. This guard also covers
 // static hosts that return index.html for an unknown URL, and bad local links.
 (() => {
-  const validPages = new Set([
-    "index.html",
-    "404.html",
-    "about-ovi-design-academy-chennai.html",
-    "all-course-ux-ui-ovi-design-academy.html",
-    "advanced-ux-ui-ai-leadership-program-ovi-design-academy.html",
-    "compare-ux-ui-courses-chennai.html",
-    "contact-ovi-design-academy-chennai.html",
-    "faq-ovi-design-academy.html",
-    "life-at-ovi-design-academy-chennai.html",
-    "new-hero.html",
-    "students-works-ovi-design-academy.html",
-    "hero-section.html",
-    "index-1.html",
-    "ux-ui-masterclass-ai-vibe-design-ovi-design-academy.html"
+  const validPaths = new Set([
+    "/",
+    "/courses/",
+    "/courses/ui-ux-design-course-chennai/",
+    "/courses/advanced-ui-ux-ai-leadership/",
+    "/courses/compare-ui-ux-courses/",
+    "/about/",
+    "/student-work/",
+    "/life-at-ovi/",
+    "/faq/",
+    "/contact/",
+    "/404.html"
   ]);
 
-  const pageNameFromPath = (pathname) => {
-    if (!pathname || pathname === "/") return "index.html";
-    if (pathname.endsWith("/")) return "__directory__";
-    const parts = pathname.split("/").filter(Boolean);
-    return decodeURIComponent(parts[parts.length - 1] || "index.html").toLowerCase();
+  const normalizePath = (pathname) => {
+    const decoded = decodeURIComponent(pathname || "/").toLowerCase().replace(/\/{2,}/g, "/");
+    if (decoded === "/" || decoded.endsWith(".html")) return decoded;
+    return decoded.endsWith("/") ? decoded : `${decoded}/`;
   };
 
-  const isValidPage = (pathname) => validPages.has(pageNameFromPath(pathname));
+  const isValidPage = (pathname) => {
+    const normalized = normalizePath(pathname);
+    return validPaths.has(normalized) || normalized.startsWith("/blog/");
+  };
   const isPageUrl = (pathname) => {
-    const name = pageNameFromPath(pathname);
-    return name.endsWith(".html") || !name.includes(".");
+    const lastSegment = pathname.split("/").filter(Boolean).pop() || "";
+    return lastSegment.endsWith(".html") || !lastSegment.includes(".");
   };
 
   const notFoundUrl = () => {
@@ -41,13 +40,13 @@
   };
 
   const redirectTo404 = () => {
-    if (pageNameFromPath(window.location.pathname) !== "404.html") {
+    if (window.location.pathname.toLowerCase() !== "/404.html") {
       window.location.replace(notFoundUrl());
     }
   };
 
   // Catch unknown URLs when a static host incorrectly serves index.html for them.
-  if (isPageUrl(window.location.pathname) && !isValidPage(window.location.pathname)) {
+  if (window.location.protocol !== "file:" && isPageUrl(window.location.pathname) && !isValidPage(window.location.pathname)) {
     redirectTo404();
     return;
   }
@@ -1643,9 +1642,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const getCourseHref = (course) => {
       const key = `${course.tag || ""} ${course.h || ""}`.toLowerCase();
       if (course.url) return course.url;
-      if (key.includes("advanced")) return "advanced-ux-ui-ai-course-chennai.html";
-      if (key.includes("ux")) return "ux-ui-design-course-in-chennai.html";
-      return "compare-ux-ui-courses-chennai.html";
+      if (key.includes("advanced")) return "/courses/advanced-ui-ux-ai-leadership/";
+      if (key.includes("ux")) return "/courses/ui-ux-design-course-chennai/";
+      return "/courses/compare-ui-ux-courses/";
     };
     el.innerHTML = courseCrossSell.map((course) => `
       <a href="${getCourseHref(course)}" class="rel-card rel-${course.cls}">
@@ -1788,7 +1787,7 @@ document.addEventListener("DOMContentLoaded", () => {
     description.textContent = slide.description;
     primaryText.textContent = slide.primaryText || "Start Your Free Demo";
     secondaryText.textContent = slide.secondaryText || "Explore Courses";
-    secondary.href = slide.secondaryHref || "all-course-ux-ui-ovi-design-academy.html";
+    secondary.href = slide.secondaryHref || "/courses/";
 
     if (slide.secondaryExternal) {
       secondary.target = "_blank";
